@@ -1,2 +1,2 @@
 language: go
-script: cd src && go test -v -run Unit
+script: cd src && go test -v -cover -run Unit
