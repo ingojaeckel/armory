@@ -1,3 +1,5 @@
+[![Build Status](https://img.shields.io/travis/ingojaeckel/armory.svg)](https://travis-ci.org/ingojaeckel/armory)
+
 # Armory - a load testing-as-a-service framework.
 
 Armory is a framework to simplify load testing micro-services. It removes the need to manage load test instances, copy scripts, upload results, etc. If you are load testing a lot of different services, Armory might help you to unify some of the different testing approaches applied by your team. Most importantly it helps you to get rid of those idle load generator instances.
