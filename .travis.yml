@@ -1,9 +1,6 @@
 language: go
-install:
-  - go get -t -v ./...
-  - go get golang.org/x/tools/cmd/cover
-  - go get github.com/mattn/goveralls
 script:
   - cd src
-  - go test -v -run Unit -covermode=count -coverprofile=coverage.out
-  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+  - go test -v -run Unit -race -coverprofile=coverage.txt -covermode=atomic
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
