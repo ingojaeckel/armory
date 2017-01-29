@@ -1,5 +1,5 @@
 [![Build Status](https://img.shields.io/travis/ingojaeckel/armory.svg)](https://travis-ci.org/ingojaeckel/armory)
-[![Code Coverage Status](https://coveralls.io/repos/github/ingojaeckel/armory/badge.svg?branch=master)](https://coveralls.io/repos/github/ingojaeckel/armory)
+[![Code Coverage Status](https://img.shields.io/codecov/c/github/ingojaeckel/armory.svg)](https://codecov.io/gh/ingojaeckel/armory)
 
 # Armory - a load testing-as-a-service framework.
 
