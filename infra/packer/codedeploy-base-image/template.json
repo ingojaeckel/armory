@@ -1,0 +1,51 @@
+{
+	"variables": {
+		"name": "codedeploy-base-image",
+		"version": "0.1",
+		"region": "us-east-1",
+		"instance_type": "t2.nano",
+    "source_ami": "ami-b73b63a0",
+    "vpc_id": "insert_your_vpc_here",
+    "subnet_id": "insert_your_subnet_here",
+    "ssh_keypair_name": "terraform",
+    "ssh_private_key_file": "terraform.pem"
+  },
+
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ssh_pty": true,
+      "communicator": "ssh",
+      "ssh_private_ip": false,
+      "ssh_username": "ec2-user",
+      "associate_public_ip_address": true,
+
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "ssh_keypair_name": "{{user `ssh_keypair_name`}}",
+      "ssh_private_key_file": "{{user `ssh_private_key_file`}}",
+      "ami_name": "{{user `name`}}-{{user `version`}}-{{timestamp}}",
+
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}"
+    }
+  ],
+
+  "provisioners": [
+		{
+      "type": "file",
+      "source": "terraform.pem",
+      "destination": "/tmp/terraform.pem"
+    },
+    {
+      "type": "file",
+      "source": "install.sh",
+      "destination": "/tmp/install.sh"
+    },
+    {
+      "type": "shell",
+      "inline": ["sudo /bin/bash /tmp/install.sh"]
+    }
+  ]
+}
