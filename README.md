@@ -1,3 +1,6 @@
+[![Build Status](https://img.shields.io/travis/ingojaeckel/armory.svg)](https://travis-ci.org/ingojaeckel/armory)
+[![Code Coverage Status](https://img.shields.io/codecov/c/github/ingojaeckel/armory.svg)](https://codecov.io/gh/ingojaeckel/armory)
+
 # Armory - a load testing-as-a-service framework.
 
 Armory is a framework to simplify load testing micro-services. It removes the need to manage load test instances, copy scripts, upload results, etc. If you are load testing a lot of different services, Armory might help you to unify some of the different testing approaches applied by your team. Most importantly it helps you to get rid of those idle load generator instances.
@@ -16,6 +19,8 @@ Armory attempts to integrate well with your existing CI/CD processes. Once deplo
 4. The CI server triggers the execution of a new test by sending an HTTP request to the Armory Frontend instance. This will return a test ID. The ID can be used to check the status of the test periodically.
 
 # Getting started
+
+Take a look at the [armory-getting-started](https://github.com/ingojaeckel/armory-getting-started) project to build & deploy your customized version of armory. Consider using this as a template for the build job which will deploy armory to your AWS account. Once you have deployed armory, use the following instructions to start new load tests using the armory frontend.
 
 ## Run load tests via Armory
 
