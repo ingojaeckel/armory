@@ -20,6 +20,8 @@ Armory attempts to integrate well with your existing CI/CD processes. Once deplo
 
 # Getting started
 
+Take a look at the [armory-getting-started](https://github.com/ingojaeckel/armory-getting-started) project to build & deploy your customized version of armory. Consider using this as a template for the build job which will deploy armory to your AWS account. Once you have deployed armory, use the following instructions to start new load tests using the armory frontend.
+
 ## Run load tests via Armory
 
 * Create a new load test package. For more information on the expected LT package file format see below.
