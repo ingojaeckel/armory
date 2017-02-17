@@ -27,7 +27,6 @@ Armory attempts to integrate well with your existing CI/CD processes. Once deplo
 
 A valid load test package is a `.tar.bz2` file containing the following files & directories:
 
-* `/run.sh`: script which should be executed to start load test; *required*
 * `/sim/*`: any simulation files or supporting source code; *required*
 * `/misc/*`: additional files that are necessary to run the load test e.g. input files that are consumed by the LT simulation; optional
 * `/lib/*.jar`: libraries that are required in order to run the simulation i.e. dependencies of the simulation which are not already part of Gatling; optional
