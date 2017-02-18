@@ -9,10 +9,8 @@ import (
 )
 
 func prepareGatlingDirectory(fromURL string, gatlingRoot string) error {
-
 	// create staging directory
-	timestamp := time.Now().UnixNano()
-	stageDirectoryName := fmt.Sprintf("/tmp/staging%d", timestamp)
+	stageDirectoryName := fmt.Sprintf("/tmp/staging%d", time.Now().UnixNano())
 	Log("creating staging directory: %s", stageDirectoryName)
 	if err := os.Mkdir(stageDirectoryName, 0777); err != nil {
 		return err
@@ -32,21 +30,12 @@ func prepareGatlingDirectory(fromURL string, gatlingRoot string) error {
 	// TODO Validate extracted artifact
 
 	// copy files from extracted artifact into gatling directory
-	Log("Copying simulations..")
-	// TODO copy * from sim/* to simulations/* without using bash file interpolation.
-	if err := execute([]string{}, "cp", "-rv", fmt.Sprintf("%s/sim/com", stageDirectoryName), fmt.Sprintf("%s/user-files/simulations/", gatlingRoot)); err != nil {
-		return err
-	}
-	Log("Copying libraries..")
-	if err := execute([]string{}, "cp", "-rv", fmt.Sprintf("%s/lib/", stageDirectoryName), fmt.Sprintf("%s/", gatlingRoot)); err != nil {
-		return err
-	}
-	Log("Copying misc other files..")
-	if err := execute([]string{}, "cp", "-rv", fmt.Sprintf("%s/misc/", stageDirectoryName), fmt.Sprintf("%s/", gatlingRoot)); err != nil {
-		return err
-	}
-
-	return nil
+	return cp([]pair{
+		// TODO copy * from sim/* to simulations/* without using bash file interpolation.
+		pair{fmt.Sprintf("%s/sim/com", stageDirectoryName), fmt.Sprintf("%s/user-files/simulations/", gatlingRoot)},
+		pair{fmt.Sprintf("%s/lib/", stageDirectoryName), fmt.Sprintf("%s/", gatlingRoot)},
+		pair{fmt.Sprintf("%s/misc/", stageDirectoryName), fmt.Sprintf("%s/", gatlingRoot)},
+	})
 }
 
 func downloadArtifact(fromURL string, toLocalFile string) error {
@@ -64,9 +53,5 @@ func downloadArtifact(fromURL string, toLocalFile string) error {
 	defer resp.Body.Close()
 
 	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

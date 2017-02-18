@@ -33,3 +33,5 @@ type workerGetResponse struct {
 type ErrorResponse struct {
 	Description string `json:"description"`
 }
+
+type pair struct{ Key, Value string }

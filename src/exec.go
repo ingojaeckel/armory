@@ -36,9 +36,5 @@ func execute(env []string, command string, args ...string) error {
 			Log(fmt.Sprintf("[cmd-stderr] %s", errScanner.Text()))
 		}
 	}()
-	err = cmd.Run()
-	if err != nil {
-		return err
-	}
-	return nil
+	return cmd.Run()
 }
