@@ -42,9 +42,18 @@ func TestUnitToJson(t *testing.T) {
 }
 
 func TestUnitWriteJSONAndLog(t *testing.T) {
-	resp := FrontendResponse{"123"}
 	w := httptest.NewRecorder()
-	if err := WriteJSONAndLog(w, 200, resp, true); err != nil {
+	if err := WriteJSONAndLog(w, 200, FrontendResponse{"123"}, true); err != nil {
+		t.Error(err.Error())
+	}
+	if w.Body.String() != `{"id":"123"}` {
+		t.Errorf("Unexpected response: %s", w.Body.String())
+	}
+}
+
+func TestUnitWriteJSON(t *testing.T) {
+	w := httptest.NewRecorder()
+	if err := writeJSON(w, 200, FrontendResponse{"123"}); err != nil {
 		t.Error(err.Error())
 	}
 	if w.Body.String() != `{"id":"123"}` {
