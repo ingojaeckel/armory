@@ -51,7 +51,6 @@ func downloadArtifact(fromURL string, toLocalFile string) error {
 		return err
 	}
 	defer resp.Body.Close()
-
 	_, err = io.Copy(out, resp.Body)
 	return err
 }

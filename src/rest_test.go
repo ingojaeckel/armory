@@ -4,9 +4,19 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 )
+
+func TestUnitTestGet(t *testing.T) {
+	rr := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/test?id=123", nil)
+	handleTestGet(rr, req)
+	if rr.Body.String() != `{"status":"unknown"}` {
+		t.Errorf("Unexpected status: %s", rr.Body.String())
+	}
+}
 
 func TestAwsIntegrationTest(t *testing.T) {
 	local := false

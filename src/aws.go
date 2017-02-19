@@ -75,9 +75,7 @@ func (runner AwsInstanceRunner) CreateInstances(r StartInstancesRequest) (StartI
 }
 
 func (runner AwsInstanceRunner) WaitUntilRunning(region string, instanceIds []*string) (RunningInstancesResponse, error) {
-	params := &ec2.DescribeInstancesInput{
-		InstanceIds: instanceIds,
-	}
+	params := &ec2.DescribeInstancesInput{InstanceIds: instanceIds}
 
 	err := retry(true, 1000, 15*1000, 30, func() (bool, error) {
 		Log("Waiting for all instances to be running.")
@@ -137,15 +135,9 @@ func (runner AwsInstanceRunner) WaitUntilRunning(region string, instanceIds []*s
 }
 
 func (runner AwsInstanceRunner) TerminateInstances(region string, instanceIds []*string) error {
-	resp, err := runner.svc.TerminateInstances(&ec2.TerminateInstancesInput{
-		InstanceIds: instanceIds,
-	})
-
-	if err != nil {
-		return err
-	}
+	resp, err := runner.svc.TerminateInstances(&ec2.TerminateInstancesInput{InstanceIds: instanceIds})
 	Log("> TerminateInstances response: %s", resp)
-	return nil
+	return err
 }
 
 func (runner AwsInstanceRunner) ListInstances(region string) error {
