@@ -1,18 +1,24 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/satori/go.uuid"
 )
 
-func BenchmarkUpdateState(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		b.StopTimer()
+func TestUpdateState(t *testing.T) {
+	for i := 0; i < 10; i++ {
 		id := uuid.NewV4().String()
-		newState := fmt.Sprintf("new state for id=%s", id)
-		b.StartTimer()
-		updateState(id, newState)
+		if getState(id) != "unknown" {
+			t.Error("invalid initial status")
+		}
+		updateState(id, "new")
+		if getState(id) != "new" {
+			t.Error("status failed to update")
+		}
+		updateStateWithDebug(id, "another update", "new2")
+		if getState(id) != "new2" {
+			t.Error("status failed to update")
+		}
 	}
 }
