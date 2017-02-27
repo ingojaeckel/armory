@@ -41,6 +41,27 @@ func TestUnitToJson(t *testing.T) {
 	}
 }
 
+func TestUnitToJson2(t *testing.T) {
+	bytes, err := toJSON(nil)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if string(bytes) != "null" {
+		t.Errorf("Unexpected number of bytes returned: %v", string(bytes))
+	}
+}
+
+func TestUnitToJson3(t *testing.T) {
+	// Cannot serialize function reference
+	bytes, err := toJSON(TestUnitToJson3)
+	if err == nil {
+		t.Error("This should have failed")
+	}
+	if len(bytes) != 0 {
+		t.Errorf("Unexpected number of bytes returned: %v", string(bytes))
+	}
+}
+
 func TestUnitWriteJSONAndLog(t *testing.T) {
 	w := httptest.NewRecorder()
 	if err := WriteJSONAndLog(w, 200, FrontendResponse{"123"}, true); err != nil {
