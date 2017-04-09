@@ -111,10 +111,16 @@ func (runner AwsInstanceRunner) WaitUntilRunning(region string, instanceIds []*s
 	runningResp := RunningInstancesResponse{getInstanceIds(describeResponse.Reservations[0]), getPublicIPAddresses(describeResponse.Reservations[0])}
 
 	for _, ipAddress := range runningResp.IPAddresses {
-		if err := callFns(
+		if err = callFns(
 			func() error { return WaitForOpenPort(*ipAddress, 22) },
-			func() error { return scpWithRetries(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/tmp/app", "/tmp/app") },	// Copy latest version of executable to worker. Attempt up to 3 times.
-			func() error { return executeSSH(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/bin/bash /tmp/start.sh") },	// Start app on worker instance
+			func() error {
+				// Copy latest version of executable to worker. Attempt up to 3 times.
+				return scpWithRetries(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/tmp/app", "/tmp/app")
+			},
+			func() error {
+				// Start app on worker instance
+				return executeSSH(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/bin/bash /tmp/start.sh")
+			},
 			func() error { return WaitForOpenPort(*ipAddress, 8080) }); err != nil {
 			return RunningInstancesResponse{}, err
 		}
@@ -123,7 +129,7 @@ func (runner AwsInstanceRunner) WaitUntilRunning(region string, instanceIds []*s
 	return runningResp, err
 }
 
-func callFns(fns ...func() error) (error) {
+func callFns(fns ...func() error) error {
 	for _, fn := range fns {
 		if err := fn(); err != nil {
 			return err
