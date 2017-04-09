@@ -111,27 +111,25 @@ func (runner AwsInstanceRunner) WaitUntilRunning(region string, instanceIds []*s
 	runningResp := RunningInstancesResponse{getInstanceIds(describeResponse.Reservations[0]), getPublicIPAddresses(describeResponse.Reservations[0])}
 
 	for _, ipAddress := range runningResp.IPAddresses {
-		if err := WaitForOpenPort(*ipAddress, 22); err != nil {
-			Log("Failed to wait for open port on instace: %s, %s", *ipAddress, err.Error())
-			return RunningInstancesResponse{}, err
-		}
-		// Copy latest version of executable to worker. Attempt up to 3 times.
-		if err := scpWithRetries(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/tmp/app", "/tmp/app"); err != nil {
-			return RunningInstancesResponse{}, err
-		}
-		// Start app on worker instance
-		if err := executeSSH(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/bin/bash /tmp/start.sh"); err != nil {
-			Log("Failed to run app start script on %s: %s", *ipAddress, err.Error())
-			return RunningInstancesResponse{}, err
-		}
-		// Wait until port 8080 is open
-		if err := WaitForOpenPort(*ipAddress, 8080); err != nil {
-			Log("Failed to wait for open port on instace: %s, %s", *ipAddress, err.Error())
+		if err := callFns(
+			func() error { return WaitForOpenPort(*ipAddress, 22) },
+			func() error { return scpWithRetries(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/tmp/app", "/tmp/app") },	// Copy latest version of executable to worker. Attempt up to 3 times.
+			func() error { return executeSSH(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/bin/bash /tmp/start.sh") },	// Start app on worker instance
+			func() error { return WaitForOpenPort(*ipAddress, 8080) }); err != nil {
 			return RunningInstancesResponse{}, err
 		}
 	}
 
 	return runningResp, err
+}
+
+func callFns(fns ...func() error) (error) {
+	for _, fn := range fns {
+		if err := fn(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (runner AwsInstanceRunner) TerminateInstances(region string, instanceIds []*string) error {
