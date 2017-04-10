@@ -4,7 +4,7 @@
 		"version": "0.2",
 		"region": "us-east-1",
 		"instance_type": "t2.nano",
-    "source_ami": "ami-b73b63a0",
+    "source_ami": "ami-22ce4934",
     "vpc_id": "insert_your_vpc_here",
     "subnet_id": "insert_your_subnet_here",
     "ssh_keypair_name": "terraform",
@@ -45,11 +45,6 @@
     },
     {
       "type": "file",
-      "source": "aws.credentials",
-      "destination": "/home/ec2-user/.aws/credentials"
-    },
-    {
-      "type": "file",
       "source": "start.sh",
       "destination": "/tmp/start.sh"
     },
@@ -61,6 +56,11 @@
     {
       "type": "shell",
       "inline": ["sudo /bin/bash /tmp/install.sh"]
+    },
+    {
+      "type": "file",
+      "source": "aws.credentials",
+      "destination": "/home/ec2-user/.aws/credentials"
     }
   ]
 }
