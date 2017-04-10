@@ -53,12 +53,11 @@ type Config struct {
 
 var conf Config
 
-func initConfiguration() error {
+func initConfiguration() {
 	// TODO Validate appConfig configuration & prevent startup if necessary.
 	conf = Config{
 		Base:               appConfig,
 		FlushDuration:      time.Duration(appConfig.FlushDurationSeconds) * time.Second,
 		IamInstanceProfile: &ec2.IamInstanceProfileSpecification{Arn: aws.String(appConfig.IamInstanceProfile)},
 	}
-	return nil
 }

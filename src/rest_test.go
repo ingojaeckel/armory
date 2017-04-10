@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +16,12 @@ func TestUnitTestGet(t *testing.T) {
 	handleTestGet(rr, req)
 	if rr.Body.String() != `{"status":"unknown"}` {
 		t.Errorf("Unexpected status: %s", rr.Body.String())
+	}
+}
+
+func TestUnitSetupMux(t *testing.T) {
+	if mux := setupMux(); mux == nil {
+		t.Error("mux must not be nil")
 	}
 }
 
@@ -43,7 +50,7 @@ func TestAwsIntegrationTest(t *testing.T) {
 		Region:          "us-east-1",
 		SimulationClass: "com.example.Loadtest",
 	}
-	b, err := toJSON(fr)
+	b, err := json.Marshal(fr)
 	if err != nil {
 		t.Error(err.Error())
 	}

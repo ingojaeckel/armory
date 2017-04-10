@@ -3,8 +3,9 @@ package main
 import "testing"
 
 func TestUnitLoadConfiguration(t *testing.T) {
-	if err := initConfiguration(); err != nil {
-		t.Errorf("Failed to init configuration: %s", err.Error())
+	initConfiguration()
+	if conf.Base.GatlingRoot == "" {
+		t.Errorf("Failed to init configuration")
 	}
 	if conf.Base.Environment != "dev" {
 		t.Error("Failed to initialize configuration correctly.")

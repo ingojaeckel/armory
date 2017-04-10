@@ -7,14 +7,6 @@ import (
 	"net/http"
 )
 
-func toJSON(r interface{}) ([]byte, error) {
-	val, err := json.Marshal(r)
-	if err != nil {
-		return []byte{}, err
-	}
-	return val, nil
-}
-
 func parseJSON(reader io.Reader, val interface{}) error {
 	body, err := ioutil.ReadAll(reader)
 	if err != nil {
@@ -29,8 +21,7 @@ func writeJSON(w http.ResponseWriter, status int, r interface{}) error {
 
 // WriteJSONAndLog Send reply as JSON to client and optionally log it.
 func WriteJSONAndLog(w http.ResponseWriter, status int, r interface{}, log bool) error {
-	val, err := toJSON(r)
-
+	val, err := json.Marshal(r)
 	if err != nil {
 		return err
 	}

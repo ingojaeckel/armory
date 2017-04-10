@@ -1,9 +1,32 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+
+	"goji.io"
+	"goji.io/pat"
 )
+
+func setupMux() *goji.Mux {
+	initConfiguration()
+	confStr, _ := json.Marshal(conf)
+	fmt.Printf("Using config: %s\n", string(confStr))
+
+	mux := goji.NewMux()
+	mux.HandleFunc(pat.Get("/health"), func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, Version)
+	})
+	mux.HandleFunc(pat.Get("/rest/version"), func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, Version)
+	})
+	mux.HandleFunc(pat.Get("/rest/test"), handleTestGet)
+	mux.HandleFunc(pat.Put("/rest/test"), handleTestPut)
+	mux.HandleFunc(pat.Put("/rest/worker"), handleWorkerPut)
+	return mux
+}
 
 func handleTestPut(w http.ResponseWriter, r *http.Request) {
 	var putRequest FrontendRequest
