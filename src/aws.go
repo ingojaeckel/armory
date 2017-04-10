@@ -96,42 +96,33 @@ func (runner AwsInstanceRunner) WaitUntilRunning(region string, instanceIds []*s
 			}
 		}
 		// Are all instances running?
-		if runningInstancesCount == len(instanceIds) {
-			return true, nil
-		}
-		return false, nil
+		return runningInstancesCount == len(instanceIds), nil
 	})
-
 	if err != nil {
 		return RunningInstancesResponse{}, err
 	}
 
 	// Describe instances one more time to determine their public IP which should be set by now.
-	describeResponse, err := runner.svc.DescribeInstances(params)
+	describeResponse, _ := runner.svc.DescribeInstances(params)
 	runningResp := RunningInstancesResponse{getInstanceIds(describeResponse.Reservations[0]), getPublicIPAddresses(describeResponse.Reservations[0])}
 
 	for _, ipAddress := range runningResp.IPAddresses {
-		if err = callFns(
-			func() error { return WaitForOpenPort(*ipAddress, 22) },
-			func() error {
-				// Copy latest version of executable to worker. Attempt up to 3 times.
-				return scpWithRetries(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/tmp/app", "/tmp/app")
-			},
-			func() error {
-				// Start app on worker instance
-				return executeSSH(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/bin/bash /tmp/start.sh")
-			},
-			func() error { return WaitForOpenPort(*ipAddress, 8080) }); err != nil {
+		if err := anyError(
+			WaitForOpenPort(*ipAddress, 22),
+			// Copy latest version of executable to worker. Attempt up to 3 times.
+			scpWithRetries(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/tmp/app", "/tmp/app"),
+			// Start app on worker instance
+			executeSSH(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/bin/bash /tmp/start.sh"),
+			WaitForOpenPort(*ipAddress, 8080)); err != nil {
 			return RunningInstancesResponse{}, err
 		}
 	}
-
-	return runningResp, err
+	return runningResp, nil
 }
 
-func callFns(fns ...func() error) error {
-	for _, fn := range fns {
-		if err := fn(); err != nil {
+func anyError(errs ...error) error {
+	for _, err := range errs {
+		if err != nil {
 			return err
 		}
 	}
@@ -145,21 +136,19 @@ func (runner AwsInstanceRunner) TerminateInstances(region string, instanceIds []
 }
 
 func (runner AwsInstanceRunner) ListInstances(region string) error {
-	// Call the DescribeInstances Operation
 	resp, err := runner.svc.DescribeInstances(nil)
 	if err != nil {
 		return err
 	}
 
 	// resp has all of the response data, pull out instance IDs:
-	Log("> Number of reservation sets: %d", len(resp.Reservations))
+	Log("> Number of reservation sets: %d\n", len(resp.Reservations))
 	for idx, res := range resp.Reservations {
-		Log("  > Number of instances: %d", len(res.Instances))
+		Log("  > Number of instances: %d\n", len(res.Instances))
 		for _, inst := range resp.Reservations[idx].Instances {
 			Log("    - Instance ID: %s, State: %s\n", *inst.InstanceId, *inst.State.Name)
 		}
 	}
-
 	return nil
 }
 

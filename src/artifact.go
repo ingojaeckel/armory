@@ -46,6 +46,7 @@ func downloadArtifact(fromURL string, toLocalFile string) error {
 		return err
 	}
 
+	// TODO download from s3 in order to just depend on s3 permissions instead of public access
 	resp, err := http.Get(fromURL)
 	if err != nil {
 		return err
