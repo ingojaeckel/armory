@@ -25,10 +25,6 @@ type workerPutRequest struct {
 	TestID          string `json:"test-id"`
 }
 
-type workerGetResponse struct {
-	Status string `json:"status"`
-}
-
 // ErrorResponse The generic error response that will be send to clients.
 type ErrorResponse struct {
 	Description string `json:"description"`

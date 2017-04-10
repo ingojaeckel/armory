@@ -12,12 +12,8 @@ import (
 )
 
 type StartInstancesRequest struct {
-	InstanceType    string
-	Region          string
-	SecurityGroupID string
-	AmiID           string
-	SubnetID        string
-	Count           int64
+	InstanceType, Region, SecurityGroupID, AmiID, SubnetID string
+	Count                                                  int64
 }
 
 type StartInstancesResponse struct {
