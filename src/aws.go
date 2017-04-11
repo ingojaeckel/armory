@@ -104,12 +104,12 @@ func (runner AwsInstanceRunner) WaitUntilRunning(region string, instanceIds []*s
 
 	for _, ipAddress := range runningResp.IPAddresses {
 		if err := anyError(
-			WaitForOpenPort(*ipAddress, 22),
+			WaitForOpenPort(*ipAddress, 22, 15),
 			// Copy latest version of executable to worker. Attempt up to 3 times.
 			scpWithRetries(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/tmp/app", "/tmp/app"),
 			// Start app on worker instance
 			executeSSH(conf.Base.WorkerUsername, *ipAddress, "/tmp/terraform.pem", "/bin/bash /tmp/start.sh"),
-			WaitForOpenPort(*ipAddress, 8080)); err != nil {
+			WaitForOpenPort(*ipAddress, 8080, 5)); err != nil {
 			return RunningInstancesResponse{}, err
 		}
 	}
@@ -156,11 +156,11 @@ func getInstanceIds(resp *ec2.Reservation) []*string {
 	return ids
 }
 
-func WaitForOpenPort(ipAddress string, port int32) error {
+func WaitForOpenPort(ipAddress string, port int32, maxAttempts int) error {
 	address := fmt.Sprintf("%s:%d", ipAddress, port)
 	Log("Waiting for open port: %s", address)
 
-	return retry(true, 1000, 20*1000, 100, func() (bool, error) {
+	return retry(true, 1000, 16*1000, maxAttempts, func() (bool, error) {
 		if _, err := net.Dial("tcp", address); err != nil {
 			return false, err
 		}
