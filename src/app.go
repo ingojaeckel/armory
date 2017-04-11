@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	initConfiguration()
 	Log("Running..")
 	log.Fatal(http.ListenAndServe(":8080", setupMux()))
 }
