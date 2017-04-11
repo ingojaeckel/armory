@@ -11,6 +11,8 @@ import (
 type AppConfig struct {
 	// Environment Name of the environment mostly for logging purposes.
 	Environment string
+	// LogglyEnabled True if logging via Loggly should be enabled. False otherwise.
+	LogglyEnabled bool
 	// LogglyToken Used for authenticating against loggly.
 	LogglyToken string
 	// FlushDuration The time after which logs will be flushed to send them to loggly.

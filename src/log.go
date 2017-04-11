@@ -18,6 +18,10 @@ func Log(msg string, args ...interface{}) {
 }
 
 func shouldFlush() bool {
+	if !conf.Base.LogglyEnabled {
+		return false
+	}
+
 	flushExpiryTime := time.Now().Add(-conf.FlushDuration)
 	if !lastFlush.Before(flushExpiryTime) {
 		return false
@@ -28,8 +32,12 @@ func shouldFlush() bool {
 }
 
 func LogWithFlush(msg string, flush bool) {
+	if !conf.Base.LogglyEnabled {
+		fmt.Println(msg)
+		return
+	}
+
 	initializeLogging()
-	// actual log message
 	logger.WithFields(logrus.Fields{"env": conf.Base.Environment}).Info(msg)
 	if flush {
 		hook.Flush()
@@ -37,6 +45,9 @@ func LogWithFlush(msg string, flush bool) {
 }
 
 func initializeLogging() {
+	if !conf.Base.LogglyEnabled {
+		return
+	}
 	if !loggingInitialized {
 		logger = logrus.New()
 		hook = logrusly.NewLogglyHook(conf.Base.LogglyToken, "https://logs-01.loggly.com/bulk/", logrus.InfoLevel, "go", "logrus")

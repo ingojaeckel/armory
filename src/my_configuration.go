@@ -5,6 +5,7 @@ func getAppConfig() *AppConfig {
 	return &AppConfig{
 		AwsAccessKey:            "your_access_key",
 		AwsSecretKey:            "your_secret_key",
+		LogglyEnabled:           false,
 		LogglyToken:             "your_loggly_token",
 		VpcSubnet:               "your_vpc_subnet",
 		SecurityGroup:           "your_security_group",
