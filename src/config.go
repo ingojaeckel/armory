@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -46,18 +47,31 @@ type AppConfig struct {
 }
 
 type Config struct {
-	Base               AppConfig
-	FlushDuration      time.Duration
-	IamInstanceProfile *ec2.IamInstanceProfileSpecification
+	Base                         AppConfig
+	FlushDuration                time.Duration
+	IamInstanceProfile           *ec2.IamInstanceProfileSpecification
+	EnvVars                      []string
+	GatlingBinary, ResultsFolder string
 }
 
-var conf Config
+var conf *Config
 
 func initConfiguration() {
+	if conf != nil {
+		return
+	}
+
+	appConfig := getAppConfig()
+
 	// TODO Validate appConfig configuration & prevent startup if necessary.
-	conf = Config{
-		Base:               appConfig,
+	conf = &Config{
+		Base:               *appConfig,
 		FlushDuration:      time.Duration(appConfig.FlushDurationSeconds) * time.Second,
 		IamInstanceProfile: &ec2.IamInstanceProfileSpecification{Arn: aws.String(appConfig.IamInstanceProfile)},
+		EnvVars:            []string{fmt.Sprintf("JAVA_OPTS=\"-Xms%s -Xmx%s\"", appConfig.GatlingInitialMemory, appConfig.GatingMaxMemory)},
+		GatlingBinary:      fmt.Sprintf("%s/bin/gatling.sh", appConfig.GatlingRoot),
+		ResultsFolder:      fmt.Sprintf("%s/results/testname", appConfig.GatlingRoot),
 	}
+
+	fmt.Printf("initialized config: %s\n", conf.Base.GatlingRoot)
 }

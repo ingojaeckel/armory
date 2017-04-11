@@ -6,12 +6,8 @@ import (
 	"os/exec"
 )
 
-var env = []string{fmt.Sprintf("JAVA_OPTS=\"-Xms%s -Xmx%s\"", conf.Base.GatlingInitialMemory, conf.Base.GatingMaxMemory)}
-var gatlingBinary = fmt.Sprintf("%s/bin/gatling.sh", conf.Base.GatlingRoot)
-var resultsFolder = fmt.Sprintf("%s/results/testname", conf.Base.GatlingRoot)
-
 func executeGatling(simClass string) error {
-	return execute(env, gatlingBinary, "-s", simClass, "-on", "testname", "-rd", "test", "-nr", "-rf", resultsFolder)
+	return execute(conf.EnvVars, conf.GatlingBinary, "-s", simClass, "-on", "testname", "-rd", "test", "-nr", "-rf", conf.ResultsFolder)
 }
 
 func execute(env []string, command string, args ...string) error {

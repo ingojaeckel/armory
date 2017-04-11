@@ -19,6 +19,7 @@ func TestPrepareGatlingDirectory2(t *testing.T) {
 }
 
 func TestUnitDownloadArtifact(t *testing.T) {
+	initConfiguration()
 	if err := downloadArtifact("https://www.google.com", "download_artifact_test.txt"); err != nil {
 		t.Errorf(err.Error())
 	}
